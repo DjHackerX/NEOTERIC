@@ -1,0 +1,13 @@
+{
+  "name": "NEOTERIC — IEDC Community",
+  "short_name": "NEOTERIC",
+  "description": "Igniting Ideas, Inspiring Innovation. The IEDC community of Sree Rama Polytechnic College, Thriprayar.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0B0B0C",
+  "theme_color": "#FFD400",
+  "icons": [
+    { "src": "images/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

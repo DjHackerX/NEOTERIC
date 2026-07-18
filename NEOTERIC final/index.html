@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEOTERIC — IEDC Community | Sree Rama Polytechnic College</title>
+<meta name="description" content="NEOTERIC is the Innovation and Entrepreneurship Development Centre (IEDC) of Sree Rama Polytechnic College, Thriprayar. Igniting Ideas, Inspiring Innovation.">
+<meta name="theme-color" content="#FFD400">
+<link rel="icon" href="images/logo.png" type="image/png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="images/logo.png">
+
+<!-- Lights-off mode: apply saved state pre-paint to avoid a flash -->
+<script>if(localStorage.getItem("neoteric-lights-off")==="1")document.documentElement.classList.add("lights-off");</script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Bootstrap 5 + Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<!-- AOS scroll animations -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/vue@3.4.31/dist/vue.global.prod.js"></script>
+</head>
+<body>
+<div id="app">
+
+<!-- Scroll progress -->
+<div class="scroll-progress" :style="{width: scrollProgress + '%'}"></div>
+
+<!-- Loader -->
+<div id="loader">
+  <img src="images/logo.png" alt="" class="loader-bulb">
+</div>
+
+<div id="particles-js"></div>
+
+<!-- Navbar -->
+<nav class="navbar-nt" id="mainNav" :class="{scrolled: scrolled}">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <img src="images/logo.png" alt="NEOTERIC logo">
+      <span>NEO<em>TERIC</em></span>
+    </a>
+    <ul class="nav-links" :class="{open: menuOpen}">
+      <li><a href="index.html" class="active" @click="closeMenu">Home</a></li>
+      <li><a href="index.html#about" @click="closeMenu">About</a></li>
+      <li><a href="team.html" @click="closeMenu">Team</a></li>
+      <li><a href="gallery.html" @click="closeMenu">Gallery</a></li>
+      <li><a href="index.html#ideathon" @click="closeMenu">Ideathon</a></li>
+      <li><a href="index.html#contact" @click="closeMenu">Contact</a></li>
+
+    </ul>
+    <a href="https://forms.gle/cTy7HHVHYoLWaWHWA" target="_blank" class="btn-nt btn-yellow nav-cta-desktop">Drop Your Idea<i class="bi bi-arrow-up-right"></i></a>
+    <button class="hamburger" aria-label="Toggle menu" @click="menuOpen = !menuOpen"><i class="bi" :class="menuOpen ? 'bi-x-lg' : 'bi-list'"></i></button>
+  </div>
+</nav>
+<div class="nav-overlay" :class="{show: menuOpen}" @click="closeMenu"></div>
+
+<!-- HERO -->
+<header class="hero" id="home">
+  <div class="container-nt">
+    <div class="hero-grid">
+      <div data-aos="fade-up">
+        <div class="hero-logo-wrap">
+          <img src="images/logo.png" alt="NEOTERIC bulb logo">
+          <div class="ring"></div>
+        </div>
+        <span class="eyebrow">IEDC Community</span>
+        <h1>NEOTERIC — <span class="accent">Igniting Ideas,</span><br>Inspiring Innovation.</h1>
+        <p class="subtitle">Innovation and Entrepreneurship Development Centre empowering student founders, builders, and thinkers.</p>
+        <p class="college">SREE RAMA POLYTECHNIC COLLEGE, THRIPRAYAR</p>
+        <div class="hero-ctas">
+          <a href="#contact" class="btn-nt btn-yellow"><i class="bi bi-people-fill"></i> Join Us</a>
+          <a href="https://forms.gle/T5HD2jypN5EP4Czu8" target="_blank" class="btn-nt btn-outline"><i class="bi bi-lightning-charge-fill"></i>Drop Your Idea</a>
+          <a href="#about" class="btn-nt btn-outline"><i class="bi bi-compass"></i> Explore Activities</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat" v-for="s in heroStats" :key="s.key"><b>{{ s.prefix }}{{ s.current }}{{ s.suffix }}</b><span>{{ s.label }}</span></div>
+        </div>
+
+        <!-- Track picker: choose what you're here to do -->
+        <div class="track-picker" data-aos="fade-up" data-aos-delay="150">
+          <span class="track-label">I'm here to</span>
+          <div class="track-options">
+            <button v-for="t in tracks" :key="t.id" class="track-chip" :class="{active: activeTrack === t.id}"
+                    :style="activeTrack === t.id ? {background: t.theme.yellow, borderColor: t.theme.yellow, color: '#111'} : {}"
+                    @click="activeTrack = t.id">
+              <i class="bi" :class="t.icon"></i> {{ t.label }}
+            </button>
+          </div>
+          <transition name="fade-swap" mode="out-in">
+            <p class="track-desc" :key="activeTrack">{{ currentTrack.desc }}</p>
+          </transition>
+        </div>
+      </div>
+      <div class="hero-visual" data-aos="fade-left" data-aos-delay="150" @mousemove="tiltMove" @mouseleave="tiltReset">
+        <div class="glass-orbit" :style="[tiltStyle, orbitGlowStyle]">
+          <span class="spark" :style="{background: currentTrack.theme.yellow, boxShadow: '0 0 10px ' + currentTrack.theme.yellow}"></span>
+          <span class="spark"></span><span class="spark"></span><span class="spark"></span>
+        </div>
+        <div class="big-bulb-wrap" :style="tiltStyle" @click="toggleLights" role="button" tabindex="0" :aria-label="lightsOff ? 'Turn the lights back on' : 'Turn the lights off'" @keyup.enter="toggleLights">
+          <div class="bulb-glow" :style="{background: 'radial-gradient(circle, ' + currentTrack.theme.yellow + 'aa, transparent 70%)'}"></div>
+          <svg class="big-bulb-svg" viewBox="0 0 120 160" :style="bulbTintStyle" role="img" aria-label="NEOTERIC idea bulb">
+            <defs>
+              <linearGradient id="bulbGlass" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" :stop-color="currentTrack.theme.glow"/>
+                <stop offset="100%" :stop-color="currentTrack.theme.yellow"/>
+              </linearGradient>
+            </defs>
+            <path d="M60 6c-24 0-40 17-40 39 0 16 8 25 15 33 5 6 8 11 9 18h32c1-7 4-12 9-18 7-8 15-17 15-33 0-22-16-39-40-39z"
+                  fill="url(#bulbGlass)" opacity=".92"/>
+            <path d="M46 60c3 10 8 18 8 30M60 55c2 12 2 23 2 35M74 60c-3 10-8 18-8 30"
+                  fill="none" stroke="#111" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+            <rect x="44" y="98" width="32" height="10" rx="3" fill="#1a1a1a"/>
+            <rect x="47" y="110" width="26" height="8" rx="2" fill="#111"/>
+            <rect x="49" y="120" width="22" height="8" rx="6" fill="#111"/>
+          </svg>
+        </div>
+        <div class="scroll-cue"><span>SCROLL</span><i class="bi bi-chevron-down"></i></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Circuit divider -->
+<div class="circuit-divider">
+  <svg viewBox="0 0 1200 46" preserveAspectRatio="none">
+    <path id="track1" d="M0,23 L300,23 L330,5 L900,5 L930,23 L1200,23" fill="none" stroke="rgba(255,212,0,.2)" stroke-width="1.5"/>
+    <circle r="4" fill="#FFD400" style="offset-path:path('M0,23 L300,23 L330,5 L900,5 L930,23 L1200,23'); animation: travel 5s linear infinite;"></circle>
+  </svg>
+</div>
+
+<!-- ABOUT IEDC -->
+<section class="section section-light" id="about">
+  <div class="container-nt">
+    <div class="row align-items-start g-5">
+      <div class="col-lg-5" data-aos="fade-up">
+        <span class="eyebrow">What is IEDC?</span>
+        <h2 class="mt-3 mb-3" style="font-size:2.3rem;">Where student ideas turn into ventures.</h2>
+        <p>The Innovation and Entrepreneurship Development Centre (IEDC) is a Kerala Startup Mission initiative that lives inside our campus — a space where students move from curiosity to creation. NEOTERIC is our chapter: a community of builders who prototype, pitch, and launch before they graduate.</p>
+        <p>We believe innovation isn't a subject you study — it's a habit you practice. Through mentorship, funding pathways, and hands-on labs, IEDC gives every student a real shot at building something that matters.</p>
+      </div>
+      <div class="col-lg-7">
+        <div class="row g-3">
+          <div class="col-md-6" v-for="(f, i) in features" :key="f.id" data-aos="fade-up" :data-aos-delay="i * 80">
+            <div class="feature-pill" :class="{active: activeFeature === f.id}" role="button" tabindex="0"
+                 @click="toggleFeature(f.id)" @keyup.enter="toggleFeature(f.id)">
+              <div class="ic"><i class="bi" :class="f.icon"></i></div>
+              <div><h5>{{ f.title }}</h5><p>{{ f.short }}</p></div>
+              <i class="bi bi-chevron-down feature-caret" :class="{open: activeFeature === f.id}"></i>
+            </div>
+          </div>
+        </div>
+        <transition name="fade-swap" mode="out-in">
+          <div class="feature-spotlight" v-if="activeFeature" :key="activeFeature">
+            <i class="bi" :class="features.find(f => f.id === activeFeature).icon"></i>
+            <p>{{ features.find(f => f.id === activeFeature).long }}</p>
+          </div>
+        </transition>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT COLLEGE -->
+<section class="section" style="padding-top:2rem;">
+  <div class="container-nt">
+    <div class="about-college-card" data-aos="fade-up">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+          <span class="eyebrow">Our Campus</span>
+          <h2 class="mt-3 mb-3" style="font-size:2rem;">Sree Rama Polytechnic College, Thriprayar</h2>
+          <p style="color:#c9c9cc;">A technical education institution built on academic excellence and a hands-on innovation culture. Our diploma programmes blend rigorous technical training with real-world problem solving, preparing students not just for jobs — but for building their own paths.</p>
+          <div class="badge-row">
+            <span class="badge-nt">Academic Excellence</span>
+            <span class="badge-nt">Technical Education</span>
+            <span class="badge-nt">Student Development</span>
+            <span class="badge-nt">Entrepreneurship Support</span>
+            <span class="badge-nt">Innovation Culture</span>
+          </div>
+        </div>
+        <div class="col-lg-5 text-lg-end">
+          <a href="#contact" class="btn-nt btn-yellow">Visit Campus <i class="bi bi-arrow-up-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Circuit divider -->
+<div class="circuit-divider">
+  <svg viewBox="0 0 1200 46" preserveAspectRatio="none">
+    <path d="M0,23 L200,23 L230,41 L970,41 L1000,23 L1200,23" fill="none" stroke="rgba(255,212,0,.2)" stroke-width="1.5"/>
+    <circle r="4" fill="#FFD400" style="offset-path:path('M0,23 L200,23 L230,41 L970,41 L1000,23 L1200,23'); animation: travel 6s linear infinite;"></circle>
+  </svg>
+</div>
+
+<!-- IDEATHON -->
+<section class="section section-yellow" id="ideathon">
+  <div class="container-nt">
+    <div class="row align-items-end mb-4">
+      <div class="col-lg-8" data-aos="fade-up">
+        <span class="eyebrow">July Event · 2026</span>
+        <h2 class="event-headline mt-3">IDEATHON<span class="fill"> 2026</span></h2>
+        <p class="mt-3" style="max-width:56ch; font-size:1.05rem; color:#222;">Got an idea that could make an impact? Step up, share your vision, and pitch your concept to a panel of judges from the startup and innovation ecosystem.</p>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-lg-6" data-aos="fade-up">
+        <span class="eyebrow">Countdown</span>
+        <div class="countdown mt-3">
+          <div class="count-box"><b>{{ countdown.days }}</b><span>Days</span></div>
+          <div class="count-box"><b>{{ countdown.hours }}</b><span>Hours</span></div>
+          <div class="count-box"><b>{{ countdown.mins }}</b><span>Mins</span></div>
+          <div class="count-box"><b>{{ countdown.secs }}</b><span>Secs</span></div>
+        </div>
+      </div>
+      <div class="col-lg-6" data-aos="fade-up" data-aos-delay="120">
+        <span class="eyebrow">Prize</span>
+        <div class="prize-strip mt-3">
+          <div class="prize-box"><h4>Exciting CASH prize</h4><span></span></div>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-4" data-aos="fade-up">
+        <div class="feature-pill" style="background:rgba(17,17,17,.06); border-color:rgba(17,17,17,.15);">
+          <div class="ic"><i class="bi bi-people-fill"></i></div>
+          <div><h5>Individual participation</h5><p style="color:#333;">Bring your ideas forward and compete individually.</p></div>
+        </div>
+      </div>
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="160">
+        <div class="feature-pill" style="background:rgba(17,17,17,.06); border-color:rgba(17,17,17,.15);">
+          <div class="ic"><i class="bi bi-lightbulb-fill"></i></i></div>
+          <div><h5>Stand out</h5><p style="color:#333;">Showcase what makes your idea unique and impactful.</p></div>
+        </div>
+      </div>
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="80">
+        <div class="feature-pill" style="background:rgba(17,17,17,.06); border-color:rgba(17,17,17,.15);">
+          <div class="ic"><i class="bi bi-trophy-fill"></i></i></div>
+          <div><h5>Win big</h5><p style="color:#333;">Compete for prizes, recognition, and opportunities.</p></div>
+        </div>
+      </div>
+      
+    </div>
+
+    <div class="reg-cta-block" data-aos="zoom-in">
+      <div>
+        <h3>The stage is yours.</h3>
+        <p>Bring your ideas, share your vision, and make an impact..</p>
+      </div>
+      <a href="https://forms.gle/T5HD2jypN5EP4Czu8" target="_blank" class="btn-nt btn-yellow" style="font-size:1rem; padding:1rem 2rem;">Drop Your Idea<i class="bi bi-arrow-up-right"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="section" id="contact">
+  <div class="container-nt">
+    <div class="row g-5">
+      <div class="col-lg-5" data-aos="fade-up">
+        <span class="eyebrow">Join the Crew</span>
+        <h2 class="mt-3 mb-3" style="font-size:2rem;">Want to join NEOTERIC?</h2>
+        <p style="color:#b9b9bd;">Fill in your details through the form and become a part of our community.</p>
+        <ul class="list-unstyled mt-4" style="color:#b9b9bd;">
+          <li class="mb-2"><i class="bi bi-envelope-fill text-warning me-2"></i> neoteric.srgpc@gmail.com</li>
+          <li class="mb-2"><i class="bi bi-telephone-fill text-warning me-2"></i> +91 95674 43672</li>
+          <li class="mb-2"><i class="bi bi-geo-alt-fill text-warning me-2"></i> Sree Rama Polytechnic College, Thriprayar, Kerala</li>
+        </ul>
+      </div>
+      <div class="col-lg-7" data-aos="fade-up" data-aos-delay="100">
+        <form class="contact-form glass-card p-4 p-md-5" @submit.prevent="submitContact">
+          <!-- Row 1: Name and Email -->
+          <div class="row">
+            <div class="col-md-6"><input type="text" placeholder="Full Name" v-model="contact.name" required></div>
+            <div class="col-md-6"><input type="email" placeholder="Email Address" v-model="contact.email" required></div>
+          </div>
+          
+          <!-- Row 2: Department and Semester -->
+          <div class="row mt-3">
+            <div class="col-md-6"><input type="text" placeholder="Department" v-model="contact.department" required></div>
+            <div class="col-md-6"><input type="text" placeholder="Semester" v-model="contact.semester" required></div>
+          </div>
+          
+          <!-- Full width: Phone Number -->
+          <input type="tel" class="mt-3" placeholder="Phone Number" v-model="contact.phone" required>
+          
+          <button type="submit" class="btn-nt btn-yellow w-100 justify-content-center mt-4" :disabled="contactSending">
+            <span v-if="contactSent">Message sent ✓</span>
+            <span v-else-if="contactSending">Sending…</span>
+            <span v-else>Send application<i class="bi bi-send-fill"></i></span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer-nt">
+  <div class="container-nt">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <a href="index.html" class="brand mb-3 d-inline-flex">
+          <img src="images/logo.png" alt="NEOTERIC logo">
+          <span>NEOT<em>ERIC</em></span>
+        </a>
+        <p style="font-size:.9rem;">The IEDC community of Sree Rama Polytechnic College, Thriprayar — part of the IEDC Kerala network under Kerala Startup Mission.</p>
+        <div class="footer-social">
+          <a href="https://www.instagram.com/iedcsreeramapoly/"><i class="bi bi-instagram"></i></a>
+          
+          <a href=""><i class="bi bi-envelope-fill"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-2 col-6">
+        <h6>Quick Links</h6>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="team.html">Team</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-3 col-6">
+        <h6>Ideathon 2026</h6>
+        <ul>
+          <li><a href="index.html#ideathon">Event details</a></li>
+          <li><a href="https://forms.gle/T5HD2jypN5EP4Czu8" target="_blank">Ideathon</a></li>
+          <li><a href="http://wa.me/916282366579">Ask a question</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-3">
+        <h6>Contact</h6>
+        <ul>
+          <li>neoteric.srgpc@gmail.com</li>
+          <li>+91 95674 43672</li>
+          <li>Thriprayar, Kerala</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">NEOTERIC © 2026 | Sree Rama Polytechnic College, Thriprayar</div>
+  </div>
+</footer>
+
+<!-- Sticky floating register -->
+
+<a href="#contact" target="_blank" class="btn-nt btn-yellow float-register"><i class="bi bi-lightning-charge-fill"></i> Join NEOTERIC</a>
+
+<!-- Back to top -->
+<button class="back-top" :class="{show: scrollY > 500}" aria-label="Back to top" @click="scrollTop"><i class="bi bi-arrow-up"></i></button>
+
+<!-- Floating bulb quote widget -->
+<div class="bulb-widget">
+  <div class="bulb-tip" ref="bulbTip" :class="{show: bulbShow}">
+    <span>"{{ bulbQuote }}"</span>
+    <small>NEOTERIC TIP</small>
+  </div>
+  <button class="bulb-btn" ref="bulbBtn" aria-label="Innovation tip" @click="toggleBulb" @mouseenter="showBulbQuote"><i class="bi bi-lightbulb-fill"></i></button>
+</div>
+
+</div><!-- /#app -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+<script src="js/particles-config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
